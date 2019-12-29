@@ -1,26 +1,26 @@
 #!/bin/bash
 
 # APP=${1} if not provided, go in bash
-NAME="ExportFace2S3"
+NAME="exportface2s3"
 
 if [ "${1}" == "" ]; then 
-  APP="${0}"
+  APP="`echo ${0} | sed 's/[\.\/]//g'`"
   RUN="/bin/bash"
 else
   APP=${1}
   RUN="python /app.py"
 fi
 
-docker build -t opencv .
+docker build -t ${NAME} .
 
-docker run -it --rm opencv python -c "import cv2; print(cv2.__version__)"
+docker run -it --rm ${NAME} python -c "import cv2; print(cv2.__version__)"
 
 sudo xhost local:root
 docker run -it --rm \
-  -v `pwd`/${APP}:/app.py \
-  -v `pwd`/faces:/faces \
-  -v `pwd`/haarcascade_frontalface_default.xml:/haarcascade_frontalface_default.xml \
-  -v `pwd`:/ext \
+  -v `pwd`/${APP}:/src/app.py \
+  -v `pwd`/faces:/src/faces \
+  -v `pwd`/haarcascade_frontalface_default.xml:/src/haarcascade_frontalface_default.xml \
+  -v `pwd`:/src \
   --device=/dev/vcsm \
   --device=/dev/vchiq \
   --device /dev/video0 \
